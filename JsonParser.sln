@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CLI", "CLI\CLI.vcxproj", "{593AF94E-05BB-42C5-9E61-1EC34DFFD64A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Native", "Native\Native.vcxproj", "{643151DB-37BB-48D3-977C-173F2DB3D9F1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{593AF94E-05BB-42C5-9E61-1EC34DFFD64A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{593AF94E-05BB-42C5-9E61-1EC34DFFD64A}.Debug|Win32.Build.0 = Debug|Win32
+		{593AF94E-05BB-42C5-9E61-1EC34DFFD64A}.Debug|x64.ActiveCfg = Debug|x64
+		{593AF94E-05BB-42C5-9E61-1EC34DFFD64A}.Debug|x64.Build.0 = Debug|x64
+		{593AF94E-05BB-42C5-9E61-1EC34DFFD64A}.Release|Win32.ActiveCfg = Release|Win32
+		{593AF94E-05BB-42C5-9E61-1EC34DFFD64A}.Release|Win32.Build.0 = Release|Win32
+		{593AF94E-05BB-42C5-9E61-1EC34DFFD64A}.Release|x64.ActiveCfg = Release|x64
+		{593AF94E-05BB-42C5-9E61-1EC34DFFD64A}.Release|x64.Build.0 = Release|x64
+		{643151DB-37BB-48D3-977C-173F2DB3D9F1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{643151DB-37BB-48D3-977C-173F2DB3D9F1}.Debug|Win32.Build.0 = Debug|Win32
+		{643151DB-37BB-48D3-977C-173F2DB3D9F1}.Debug|x64.ActiveCfg = Debug|x64
+		{643151DB-37BB-48D3-977C-173F2DB3D9F1}.Debug|x64.Build.0 = Debug|x64
+		{643151DB-37BB-48D3-977C-173F2DB3D9F1}.Release|Win32.ActiveCfg = Release|Win32
+		{643151DB-37BB-48D3-977C-173F2DB3D9F1}.Release|Win32.Build.0 = Release|Win32
+		{643151DB-37BB-48D3-977C-173F2DB3D9F1}.Release|x64.ActiveCfg = Release|x64
+		{643151DB-37BB-48D3-977C-173F2DB3D9F1}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
