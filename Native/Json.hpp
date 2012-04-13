@@ -124,12 +124,14 @@ namespace Json
 			Type IteratorType;
 			JsonHash::const_iterator Hash;
 			JsonArray::const_iterator Array;
+
 			IteratorContainer(JsonHash::const_iterator HashIterator)
 			{
 				IteratorType=Type::Hash;
 				Hash=HashIterator;
 				return;
 			}
+
 			IteratorContainer(JsonArray::const_iterator ArrayIterator)
 			{
 				IteratorType=Type::Array;
@@ -150,8 +152,12 @@ namespace Json
 	};
 	
 	/*
-	_Export Item Parse(const std::wstring& JsonString);
-	_Export std::wstring ToString(const Item& Obj);
+	bool ParseBool(JsonString::const_iterator& Char);
+	JsonString ParseString(JsonString::const_iterator& Char);
+	bool ParseNull(JsonString::const_iterator& Char);
+	JsonString ToEscapeString(const JsonString& String);
+	_Export Item Parse(const JsonString& JsonString);
+	_Export JsonString ToString(const Item& Obj);
 	*/
 
 	Item::Item(void):Value(InitValue())
@@ -742,12 +748,22 @@ namespace Json
 					IteratorLevel.top().Hash++;
 				}else{
 					JsonString[JsonString.length()-1]=L']';
+					Level.top().Array().push_back(Obj);
+					Level.push(Obj);
+				}else if(*Char==L'n'){
+					Level.top().Array().push_back(ParseNull(Char)?Item(Type::Null):throw std::exception());
+				}else if(*Char==L']') Level.pop();
+			}
+		}while(Level.size()!=0&&Char!=JsonString.cend());
 					Level.pop();
 					IteratorLevel.pop();
 					if(Level.size()>0) JsonString+=L',';
 				}
 			}else throw std::exception("配列又は連想配列を表す型は、Json::Array\n又はJson::Hashでなければなりません。");
-		}
+		};
+						Level.push(Member);
+						IteratorLevel.top().Array++;
+						IteratorLevel.push(IteratorContainer(Member.Array().cbegin()));
 		return JsonString;
 	}
 
