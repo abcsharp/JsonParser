@@ -89,7 +89,7 @@ namespace Json
 		Item(JsonHash&& Hash);
 		Item(JsonArray&& Array);
 		~Item(void);
-		Type Type(void)const;
+		Type GetType(void)const;
 		bool IsNull(void)const;
 		long long& Int(void);
 		double& Double(void);
@@ -131,6 +131,10 @@ namespace Json
 		const Item& operator()(const std::wstring& Key)const;
 		const Item& operator()(const wchar_t*& Key)const;
 		const Item& operator()(const int& Index)const;
+		Item& operator+=(const Item& Element);
+		Item& operator+=(Item&& Element);
+		Item& operator+=(const JsonArray& Elements);
+		Item& operator+=(JsonArray&& Elements);
 		bool operator!(void)const;
 
 	};
@@ -254,7 +258,7 @@ namespace Json
 
 	Item::Item(const Item& LeftRef)
 	{
-		Type_Value=LeftRef.Type();
+		Type_Value=LeftRef.GetType();
 		Value=LeftRef.Value;
 		IsNull_Value=Type_Value==Type::Null?true:false;
 		return;
@@ -262,7 +266,7 @@ namespace Json
 
 	Item::Item(Item&& RightRef)
 	{
-		Type_Value=RightRef.Type();
+		Type_Value=RightRef.GetType();
 		Value=std::move(RightRef.Value);
 		IsNull_Value=Type_Value==Type::Null?true:false;
 		return;
@@ -400,7 +404,7 @@ namespace Json
 		return;
 	}
 
-	Type Item::Type(void)const
+	Type Item::GetType(void)const
 	{
 		return Type_Value;
 	}
@@ -472,7 +476,7 @@ namespace Json
 
 	Item& Item::operator=(const Item& LeftRef)
 	{
-		Json::Type ItemType=LeftRef.Type();
+		Json::Type ItemType=LeftRef.GetType();
 		Value=LeftRef.Value;
 		IsNull_Value=ItemType==Type::Null?true:false;
 		return *this;
@@ -480,7 +484,7 @@ namespace Json
 
 	Item& Item::operator=(Item&& RightRef)
 	{
-		Type_Value=RightRef.Type();
+		Type_Value=RightRef.GetType();
 		Value=std::move(RightRef.Value);
 		IsNull_Value=Type_Value==Type::Null?true:false;
 		return *this;
@@ -616,6 +620,46 @@ namespace Json
 		return Value->Array_Value.at(Index);
 	}
 
+	Item& Item::operator+=(const Item& Element)
+	{
+		if(Type_Value!=Type::Array){
+			Value=std::make_shared<Values>(JsonArray());
+			Type_Value=Type::Array;
+		}
+		Value->Array_Value.push_back(Element);
+		return *this;
+	}
+
+	Item& Item::operator+=(Item&& Element)
+	{
+		if(Type_Value!=Type::Array){
+			Value=std::make_shared<Values>(JsonArray());
+			Type_Value=Type::Array;
+		}
+		Value->Array_Value.push_back(std::move(Element));
+		return *this;
+	}
+
+	Item& Item::operator+=(const JsonArray& Elements)
+	{
+		if(Type_Value!=Type::Array){
+			Value=std::make_shared<Values>(JsonArray());
+			Type_Value=Type::Array;
+		}
+		std::for_each(Elements.cbegin(),Elements.cend(),[&](const Item& Element){Value->Array_Value.push_back(Element);});
+		return *this;
+	}
+
+	Item& Item::operator+=(JsonArray&& Elements)
+	{
+		if(Type_Value!=Type::Array){
+			Value=std::make_shared<Values>(JsonArray());
+			Type_Value=Type::Array;
+		}
+		std::for_each(Elements.begin(),Elements.end(),[&](Item& Element){Value->Array_Value.push_back(Element);});
+		return *this;
+	}
+
 	bool Item::operator!(void)const
 	{
 		return IsNull_Value;
@@ -623,8 +667,8 @@ namespace Json
 
 	bool operator==(const Item& Left,const Item& Right)
 	{
-		if(Left.Type()!=Right.Type()) return false;
-		switch(Left.Type()){
+		if(Left.GetType()!=Right.GetType()) return false;
+		switch(Left.GetType()){
 		case Type::Null:
 			return true;
 		case Type::Int:
@@ -723,31 +767,31 @@ namespace Json
 
 	std::wstring Parser::Create(const Item& Root)
 	{
-		std::stack<const Item> Level;
+		std::stack<Item> Level;
 		std::stack<IteratorContainer> IteratorLevel;
 		std::wstring JsonString;
 		std::wostringstream Converter;
 		Converter.precision(10);
 		Converter.setf(std::ios::scientific);
 		JsonString.reserve(1000);
-		if(Root.Type()==Type::Hash){
+		if(Root.GetType()==Type::Hash){
 			JsonString+=L'{';
 			IteratorLevel.push(IteratorContainer(Root.Hash().cbegin()));
-		}else if(Root.Type()==Type::Array){
+		}else if(Root.GetType()==Type::Array){
 			JsonString+=L'[';
 			IteratorLevel.push(IteratorContainer(Root.Array().cbegin()));
-		}else if(Root.Type()==Type::Null) return JsonString;
-		else throw std::exception("配列又は連想配列を表す型は、Json::Array\n又はJson::Hashでなければなりません。");
+		}else if(Root.GetType()==Type::Null) return JsonString;
+		else throw std::exception(/*"配列又は連想配列を表す型は、Json::Array\n又はJson::Hashでなければなりません。"*/);
 		Level.push(Root);
 		while(Level.size()>0){
-			Type ObjType=Level.top().Type();
+			Type ObjType=Level.top().GetType();
 			if(ObjType==Type::Hash){
 				if(IteratorLevel.top().Hash!=Level.top().Hash().cend()){
 					JsonString+=L'\"';
 					JsonString+=(*IteratorLevel.top().Hash).first;
 					JsonString+=L"\":";
 					const Item& Member=(*IteratorLevel.top().Hash).second;
-					switch(Member.Type()){
+					switch(Member.GetType()){
 					case Type::Null:
 						JsonString+=L"null";
 						break;
@@ -791,7 +835,7 @@ namespace Json
 			}else if(ObjType==Type::Array){
 				if(IteratorLevel.top().Array!=Level.top().Array().cend()){
 					const Item& Member=*IteratorLevel.top().Array;
-					switch(Member.Type()){
+					switch(Member.GetType()){
 					case Type::Null:
 						JsonString+=L"null";
 						break;
@@ -825,14 +869,14 @@ namespace Json
 						continue;
 					}
 					JsonString+=L',';
-					IteratorLevel.top().Hash++;
+					IteratorLevel.top().Array++;
 				}else{
 					JsonString[JsonString.length()-1]=L']';
 					Level.pop();
 					IteratorLevel.pop();
 					if(Level.size()>0) JsonString+=L',';
 				}
-			}else throw std::exception("配列又は連想配列を表す型は、Json::Array\n又はJson::Hashでなければなりません。");
+			}else throw std::exception(/*"配列又は連想配列を表す型は、Json::Array\n又はJson::Hashでなければなりません。"*/);
 		}
 		return JsonString;
 	}
@@ -847,13 +891,13 @@ namespace Json
 		do{
 			if(*Char==L'{') Root=Item(Type::Hash);
 			else if(*Char==L'[') Root=Item(Type::Array);
-			else if(*Char!=L' '&&*Char!=L'\t'&&*Char!=L'\n'&&*Char!=L'\r') throw std::exception("不正な文字が含まれています。");
-		}while(Root.Type()==Type::Null&&++Char!=JsonString.cend());
+			else if(*Char!=L' '&&*Char!=L'\t'&&*Char!=L'\n'&&*Char!=L'\r') throw std::exception(/*"不正な文字が含まれています。"*/);
+		}while(Root.GetType()==Type::Null&&++Char!=JsonString.cend());
 		Level.push(Root);
 		do{
 			Char++;
 			if(*Char==L','||*Char==L' '||*Char==L'\t'||*Char==L'\n'||*Char==L'\r') continue;
-			Type ObjType=Level.top().Type();
+			Type ObjType=Level.top().GetType();
 			if(ObjType==Type::Hash){
 				std::wstring Key;
 				if(*Char==L'\"'){
@@ -876,15 +920,15 @@ namespace Json
 						double Temp;
 						Converter>>Temp;
 						Level.top().Hash().insert(std::make_pair(Key,Item(Temp)));
-					}else throw std::exception("数字以外の文字が入っている、または不正な数値形式の文字列です。\nJSONの数値文字列は10進数で記述しなければなりません。");
+					}else throw std::exception(/*"数字以外の文字が入っている、または不正な数値形式の文字列です。\nJSONの数値文字列は10進数で記述しなければなりません。"*/);
 				}else if(*Char==L't'||*Char==L'f'){
 					Level.top().Hash().insert(std::make_pair(Key,Item(ParseBool(Char))));
 				}else if(*Char==L'{'){
-					Item& Obj=Item(Type::Hash);
+					Item Obj(Type::Hash);
 					Level.top().Hash().insert(std::make_pair(Key,Obj));
 					Level.push(Obj);
 				}else if(*Char==L'['){
-					Item& Obj=Item(Type::Array);
+					Item Obj(Type::Array);
 					Level.top().Hash().insert(std::make_pair(Key,Obj));
 					Level.push(Obj);
 				}else if(*Char==L'n'){
@@ -906,16 +950,16 @@ namespace Json
 						double Temp;
 						Converter>>Temp;
 						Level.top().Array().push_back(Item(Temp));
-					}else throw std::exception("数字以外の文字が入っている、または不正な数値形式の文字列です。\nJSONの数値文字列は10進数で記述しなければなりません。");
+					}else throw std::exception(/*"数字以外の文字が入っている、または不正な数値形式の文字列です。\nJSONの数値文字列は10進数で記述しなければなりません。"*/);
 					Char--;
 				}else if(*Char==L't'||*Char==L'f'){
 					Level.top().Array().push_back(Item(ParseBool(Char)));
 				}else if(*Char==L'{'){
-					Item& Obj=Item(Type::Hash);
+					Item Obj(Type::Hash);
 					Level.top().Array().push_back(Obj);
 					Level.push(Obj);
 				}else if(*Char==L'['){
-					Item& Obj=Item(Type::Array);
+					Item Obj(Type::Array);
 					Level.top().Array().push_back(Obj);
 					Level.push(Obj);
 				}else if(*Char==L'n'){

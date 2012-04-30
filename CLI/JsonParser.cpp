@@ -79,13 +79,13 @@ namespace Json{
 		Pos=0;
 		Root=nullptr;
 		Raw=String::Copy(DataString);
-		Bracket=gcnew Stack();
+		Bracket=gcnew Stack<Object^>();
 		while(Root==nullptr){
 			if(Raw[Pos]==L'{'){
-				Root=gcnew Hashtable();
+				Root=gcnew JsonHash();
 				break;
 			}else if(Raw[Pos]==L'['){
-				Root=gcnew ArrayList();
+				Root=gcnew JsonArray();
 				break;
 			}else if(Raw[Pos]!=L' '&&Raw[Pos]!=L'\t'&&Raw[Pos]!=L'\n'&&Raw[Pos]!=L'\r'){
 				throw gcnew FormatException("不正な文字が発見されました。位置:"+Pos.ToString()+" 文字:"+Raw[Pos].ToString());
@@ -97,7 +97,7 @@ namespace Json{
 			Pos++;
 			if(Raw[Pos]==L','||Raw[Pos]==L' '||Raw[Pos]==L'\t'||Raw[Pos]==L'\n'||Raw[Pos]==L'\r') continue;
 			Type^ ObjType=Bracket->Peek()->GetType();
-			if(ObjType==Hashtable::typeid){
+			if(ObjType==JsonHash::typeid){
 				String^ Key;
 				if(Raw[Pos]==L'\"'){
 					Key=ParseString();
@@ -105,53 +105,53 @@ namespace Json{
 					for(Pos=Pos+1;Raw[Pos]==L' '||Raw[Pos]==L'\t'||Raw[Pos]==L'\n'||Raw[Pos]==L'\r';Pos++) continue;
 				}
 				if(Raw[Pos]==L'\"'){
-					((Hashtable^)Bracket->Peek())->Add(Key,ParseString());
+					((JsonHash^)Bracket->Peek())->Add(Key,ParseString());
 				}else if(Raw[Pos]==L'-'||(Raw[Pos]>=L'0'&&Raw[Pos]<=L'9')){
 					int Start=Pos;
 					for(Pos;;Pos++) if(Raw[Pos]==L' '||Raw[Pos]==L'\t'||Raw[Pos]==L'\n'||Raw[Pos]==L'\r'||Raw[Pos]==L','||Raw[Pos]==L'}'||Raw[Pos]==L']') break;
 					String^ Input=Raw->Substring(Start,Pos-Start);
-					if(Regex::IsMatch(Input,L"-?\\d+")) ((Hashtable^)Bracket->Peek())->Add(Key,ParseInt(Input));
-					else if(Regex::IsMatch(Input,L"-?\\d+\\.\\d+([eE][+-]\\d+)?")) ((Hashtable^)Bracket->Peek())->Add(Key,ParseDouble(Input));
+					if(Regex::IsMatch(Input,L"-?\\d+")) ((JsonHash^)Bracket->Peek())->Add(Key,ParseInt(Input));
+					else if(Regex::IsMatch(Input,L"-?\\d+\\.\\d+([eE][+-]\\d+)?")) ((JsonHash^)Bracket->Peek())->Add(Key,ParseDouble(Input));
 					else throw gcnew FormatException("数字以外の文字が入っている、または不正な数値形式の文字列です。\nJSONの数値文字列は10進数で記述しなければなりません。");
 					delete Input;
 					Pos--;
 				}else if(Raw[Pos]==L't'||Raw[Pos]==L'f'){
-					((Hashtable^)Bracket->Peek())->Add(Key,ParseBoolean());
+					((JsonHash^)Bracket->Peek())->Add(Key,ParseBoolean());
 				}else if(Raw[Pos]==L'{'){
-					Hashtable^ Obj=gcnew Hashtable();
-					((Hashtable^)Bracket->Peek())->Add(Key,Obj);
+					JsonHash^ Obj=gcnew JsonHash();
+					((JsonHash^)Bracket->Peek())->Add(Key,Obj);
 					Bracket->Push(Obj);
 				}else if(Raw[Pos]==L'['){
-					ArrayList^ Ary=gcnew ArrayList();
-					((Hashtable^)Bracket->Peek())->Add(Key,Ary);
+					JsonArray^ Ary=gcnew JsonArray();
+					((JsonHash^)Bracket->Peek())->Add(Key,Ary);
 					Bracket->Push(Ary);
 				}else if(Raw[Pos]==L'n'){
-					((Hashtable^)Bracket->Peek())->Add(Key,ParseNull());
+					((JsonHash^)Bracket->Peek())->Add(Key,ParseNull());
 				}else if(Raw[Pos]==L'}') Bracket->Pop();
-			}else if(ObjType==ArrayList::typeid){
+			}else if(ObjType==JsonArray::typeid){
 				if(Raw[Pos]==L'\"'){
-					((ArrayList^)Bracket->Peek())->Add(ParseString());
+					((JsonArray^)Bracket->Peek())->Add(ParseString());
 				}else if(Raw[Pos]==L'-'||(Raw[Pos]>=L'0'&&Raw[Pos]<=L'9')){
 					int Start=Pos;
 					for(Pos;;Pos++) if(Raw[Pos]==L' '||Raw[Pos]==L'\t'||Raw[Pos]==L'\n'||Raw[Pos]==L'\r'||Raw[Pos]==L','||Raw[Pos]==L'}'||Raw[Pos]==L']') break;
 					String^ Input=Raw->Substring(Start,Pos-Start);
-					if(Regex::IsMatch(Input,L"-?\\d+")) ((ArrayList^)Bracket->Peek())->Add(ParseInt(Input));
-					else if(Regex::IsMatch(Input,L"-?\\d+\\.\\d+([eE][+-]\\d+)?")) ((ArrayList^)Bracket->Peek())->Add(ParseDouble(Input));
+					if(Regex::IsMatch(Input,L"-?\\d+")) ((JsonArray^)Bracket->Peek())->Add(ParseInt(Input));
+					else if(Regex::IsMatch(Input,L"-?\\d+\\.\\d+([eE][+-]\\d+)?")) ((JsonArray^)Bracket->Peek())->Add(ParseDouble(Input));
 					else throw gcnew FormatException("数字以外の文字が入っている、または不正な数値形式の文字列です。\nJSONの数値文字列は10進数で記述しなければなりません。");
 					delete Input;
 					Pos--;
 				}else if(Raw[Pos]==L't'||Raw[Pos]==L'f'){
-					((ArrayList^)Bracket->Peek())->Add(ParseBoolean());
+					((JsonArray^)Bracket->Peek())->Add(ParseBoolean());
 				}else if(Raw[Pos]==L'{'){
-					Hashtable^ Obj=gcnew Hashtable();
-					((ArrayList^)Bracket->Peek())->Add(Obj);
+					JsonHash^ Obj=gcnew JsonHash();
+					((JsonArray^)Bracket->Peek())->Add(Obj);
 					Bracket->Push(Obj);
 				}else if(Raw[Pos]==L'['){
-					ArrayList^ Ary=gcnew ArrayList();
-					((ArrayList^)Bracket->Peek())->Add(Ary);
+					JsonArray^ Ary=gcnew JsonArray();
+					((JsonArray^)Bracket->Peek())->Add(Ary);
 					Bracket->Push(Ary);
 				}else if(Raw[Pos]==L'n'){
-					((ArrayList^)Bracket->Peek())->Add(ParseNull());
+					((JsonArray^)Bracket->Peek())->Add(ParseNull());
 				}else if(Raw[Pos]==L']') Bracket->Pop();
 			}
 			delete ObjType;

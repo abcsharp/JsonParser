@@ -21,6 +21,7 @@ namespace Json{
 	String^ JsonCreator::CreateString(String^ Raw)
 	{
 		StringBuilder^ Value=gcnew StringBuilder();
+		Value->Append("\"");
 		for(int i=0;i<Raw->Length;i++){
 			if(Raw[i]==L'\"') Value->Append(L"\\\"");
 			else if(Raw[i]==L'\\') Value->Append(L"\\\\");
@@ -33,29 +34,29 @@ namespace Json{
 			else if(Raw[i]<=L'\x007F') Value->Append(Raw[i]);
 			else Value->AppendFormat(L"\\u{0:X4}",(UInt16)Raw[i]);
 		}
-		return Value->ToString();
+		return Value->Append("\"")->ToString();
 	}
 
-	String^ JsonCreator::Create(Object^ DataArray)
+	String^ JsonCreator::Create(Object^ Data)
 	{
-		Level=gcnew Stack();
+		Level=gcnew Stack<Object^>();
 		JsonStr=gcnew StringBuilder();
-		Type^ CurrentType=DataArray->GetType();
-		IEnumerator^ Enumerate;
-		if(CurrentType==Hashtable::typeid){
+		Type^ CurrentType=Data->GetType();
+		IEnumerator<Object^>^ Enumerate;
+		if(CurrentType==JsonHash::typeid){
 			JsonStr->Append(L'{');
-			Enumerate=((Hashtable^)DataArray)->Keys->GetEnumerator();
-		}else if(CurrentType==ArrayList::typeid){
+			Enumerate=(IEnumerator<Object^>^)(IEnumerator<String^>^)((JsonHash^)Data)->Keys->GetEnumerator();
+		}else if(CurrentType==JsonArray::typeid){
 			JsonStr->Append(L'[');
-			Enumerate=((IEnumerable^)DataArray)->GetEnumerator();
-		}else throw gcnew FormatException("配列又は連想配列を表す型は、System.Collections.ArrayList\n又はSystem.Collections.Hashtableでなければなりません。");
-		Level->Push(DataArray);
+			Enumerate=((IEnumerable<Object^>^)Data)->GetEnumerator();
+		}else throw gcnew FormatException("配列又は連想配列を表す型は、System.Collections.Generic.List(System.Object)\nおよびSystem.Collections.Generic.Dictionary(System.String,System.Object)でなければなりません。");
+		Level->Push(Data);
 		do{
 			bool Result=Enumerate->MoveNext();
 			CurrentType=Level->Peek()->GetType();
-			if(CurrentType==Hashtable::typeid){
+			if(CurrentType==JsonHash::typeid){
 				if(Result){
-					Object^ Member=((Hashtable^)Level->Peek())[(String^)Enumerate->Current];
+					Object^ Member=((JsonHash^)Level->Peek())[(String^)Enumerate->Current];
 					Type^ MemberType=(Member==nullptr)?(nullptr):(Member->GetType());
 					JsonStr->Append(CreateString((String^)Enumerate->Current));
 					JsonStr->Append(L':');
@@ -64,31 +65,31 @@ namespace Json{
 					else if(MemberType==double::typeid) JsonStr->Append((double)Member);
 					else if(MemberType==bool::typeid) JsonStr->Append(((bool)Member).ToString()->ToLower());
 					else if(MemberType==String::typeid) JsonStr->Append(CreateString((String^)Member));
-					else if(MemberType==Hashtable::typeid){
+					else if(MemberType==JsonHash::typeid){
 						JsonStr->Append(L'{');
 						Level->Push(Enumerate);
 						Level->Push(Member);
-						Enumerate=((Hashtable^)Level->Peek())->Keys->GetEnumerator();
+						Enumerate=(IEnumerator<Object^>^)(IEnumerator<String^>^)((JsonHash^)Level->Peek())->Keys->GetEnumerator();
 						continue;
-					}else if(MemberType==ArrayList::typeid){
+					}else if(MemberType==JsonArray::typeid){
 						JsonStr->Append(L'[');
 						Level->Push(Enumerate);
 						Level->Push(Member);
-						Enumerate=((ArrayList^)Level->Peek())->GetEnumerator();
+						Enumerate=((JsonArray^)Level->Peek())->GetEnumerator();
 						continue;
 					}else throw gcnew FormatException("オブジェクトの型が数値(System.Int64,System.Double)、\n"
-												  "論理値(System.Boolean)、文字列(System.String)、配列(System.Collections.ArrayList)、\n"
-												  "連想配列(System.Collections.Hashtable)以外の型です。");
+												  "論理値(System.Boolean)、文字列(System.String)、配列(System.Collections.Generic.List(System.Object))、\n"
+												  "連想配列(System.Collections.Generic.Dictionary(System.String,System.Object))以外の型です。");
 					JsonStr->Append(L',');
 				}else{
 					JsonStr[JsonStr->Length-1]=L'}';
 					Level->Pop();
 					if(Level->Count>0){
-						Enumerate=(IEnumerator^)Level->Pop();
+						Enumerate=(IEnumerator<Object^>^)Level->Pop();
 						JsonStr->Append(L",");
 					}
 				}
-			}else if(CurrentType==ArrayList::typeid){
+			}else if(CurrentType==JsonArray::typeid){
 				if(Result){
 					Object^ Member=Enumerate->Current;
 					Type^ MemberType=(Member==nullptr)?(nullptr):(Member->GetType());
@@ -97,31 +98,31 @@ namespace Json{
 					else if(MemberType==double::typeid) JsonStr->Append((double)Member);
 					else if(MemberType==bool::typeid) JsonStr->Append(((bool)Member).ToString()->ToLower());
 					else if(MemberType==String::typeid) JsonStr->Append(CreateString((String^)Member));
-					else if(MemberType==Hashtable::typeid){
+					else if(MemberType==JsonHash::typeid){
 						JsonStr->Append(L'{');
 						Level->Push(Enumerate);
 						Level->Push(Member);
-						Enumerate=((Hashtable^)Level->Peek())->Keys->GetEnumerator();
+						Enumerate=(IEnumerator<Object^>^)(IEnumerator<String^>^)((JsonHash^)Level->Peek())->Keys->GetEnumerator();
 						continue;
-					}else if(MemberType==ArrayList::typeid){
+					}else if(MemberType==JsonArray::typeid){
 						JsonStr->Append(L'[');
 						Level->Push(Enumerate);
 						Level->Push(Member);
-						Enumerate=((ArrayList^)Level->Peek())->GetEnumerator();
+						Enumerate=((JsonArray^)Level->Peek())->GetEnumerator();
 						continue;
 					}else throw gcnew FormatException("オブジェクトの型が数値(System.Int64,System.Double)、\n"
-												  "論理値(System.Boolean)、文字列(System.String)、配列(System.Collections.ArrayList)、\n"
-												  "連想配列(System.Collections.Hashtable)以外の型です。");
+						"論理値(System.Boolean)、文字列(System.String)、配列(System.Collections.Generic.List(Object))、\n"
+												  "連想配列(System.Collections.Generic.Dictionary(System.String,System.Object))以外の型です。");
 					JsonStr->Append(L',');
 				}else{
 					JsonStr[JsonStr->Length-1]=L']';
 					Level->Pop();
 					if(Level->Count>0){
-						Enumerate=(IEnumerator^)Level->Pop();
+						Enumerate=(IEnumerator<Object^>^)Level->Pop();
 						JsonStr->Append(L',');
 					}
 				}
-			}else throw gcnew FormatException("配列又は連想配列を表す型は、System.Collections.ArrayList\n又はSystem.Collections.Hashtableでなければなりません。");
+			}else throw gcnew FormatException("配列又は連想配列を表す型は、System.Collections.Generic.List(System.Object)\nおよびSystem.Collections.Generic.Dictionary(System.String,System.Object)でなければなりません。");
 			delete CurrentType;
 		}while(Level->Count>0);
 		delete CurrentType;

@@ -2,17 +2,19 @@
 
 using namespace System;
 using namespace System::Text;
-using namespace System::Collections;
+using namespace System::Collections::Generic;
 using namespace System::Text::RegularExpressions;
 
 namespace Json{
 
+	typedef List<Object^> JsonArray;
+	typedef Dictionary<String^,Object^> JsonHash;
 
 	public ref class JsonParser
 	{
 	private:
 		String^ Raw;
-		Stack^ Bracket;
+		Stack<Object^>^ Bracket;
 		Object^ Root;
 		int Pos;
 
@@ -33,7 +35,7 @@ namespace Json{
 	public ref class JsonCreator
 	{
 	private:
-		Stack^ Level;
+		Stack<Object^>^ Level;
 		StringBuilder^ JsonStr;
 
 	public:
@@ -43,6 +45,6 @@ namespace Json{
 		String^ CreateString(String^ Raw);
 
 		void ClearCache(bool IsActivateGC);
-		String^ Create(Object^ DataArray);
+		String^ Create(Object^ Data);
 	};
 }
