@@ -82,7 +82,9 @@ namespace Json{
 												  "連想配列(System.Collections.Generic.Dictionary(System.String,System.Object))以外の型です。");
 					JsonStr->Append(L',');
 				}else{
-					JsonStr[JsonStr->Length-1]=L'}';
+					int LastIndex=JsonStr->Length-1;
+					if(JsonStr[LastIndex]==L',') JsonStr[LastIndex]=L'}';
+					else JsonStr->Append(L'}');
 					Level->Pop();
 					if(Level->Count>0){
 						Enumerate=(IEnumerator<Object^>^)Level->Pop();
@@ -115,7 +117,9 @@ namespace Json{
 												  "連想配列(System.Collections.Generic.Dictionary(System.String,System.Object))以外の型です。");
 					JsonStr->Append(L',');
 				}else{
-					JsonStr[JsonStr->Length-1]=L']';
+					int LastIndex=JsonStr->Length-1;
+					if(JsonStr[LastIndex]==L',') JsonStr[LastIndex]=L']';
+					else JsonStr->Append(L']');
 					Level->Pop();
 					if(Level->Count>0){
 						Enumerate=(IEnumerator<Object^>^)Level->Pop();

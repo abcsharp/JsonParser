@@ -1,3 +1,6 @@
+#pragma once
+#ifndef __INC_JSON_HPP__
+#define __INC_JSON_HPP__
 #include <vector>
 #include <string>
 #include <map>
@@ -43,19 +46,70 @@ namespace Json
 			JsonHash Hash_Value;
 			JsonArray Array_Value;
 
-			Values(void);
-			Values(const long long& Int);
-			Values(const double& Double);
-			Values(const bool& Bool);
-			Values(const JsonString& String);
-			Values(const JsonHash& Hash);
-			Values(const JsonArray& Array);
-			Values(long long&& Int);
-			Values(double&& Double);
-			Values(bool&& Bool);
-			Values(JsonString&& String);
-			Values(JsonHash&& Hash);
-			Values(JsonArray&& Array);
+			Values(void)
+			{
+				return;
+			}
+
+			Values(const long long& Int):Int_Value(Int)
+			{
+				return;
+			}
+
+			Values(const double& Double):Double_Value(Double)
+			{
+				return;
+			}
+
+			Values(const bool& Bool):Bool_Value(Bool)
+			{
+				return;
+			}
+
+			Values(const JsonString& String):String_Value(String)
+			{
+				return;
+			}
+
+			Values(const JsonHash& Hash):Hash_Value(Hash)
+			{
+				return;
+			}
+
+			Values(const JsonArray& Array):Array_Value(Array)
+			{
+				return;
+			}
+
+			Values(long long&& Int):Int_Value(Int)
+			{
+				return;
+			}
+
+			Values(double&& Double):Double_Value(Double)
+			{
+				return;
+			}
+
+			Values(bool&& Bool):Bool_Value(Bool)
+			{
+				return;
+			}
+
+			Values(JsonString&& String):String_Value(String)
+			{
+				return;
+			}
+
+			Values(JsonHash&& Hash):Hash_Value(Hash)
+			{
+				return;
+			}
+
+			Values(JsonArray&& Array):Array_Value(Array)
+			{
+				return;
+			}
 
 		};
 
@@ -64,6 +118,7 @@ namespace Json
 		bool IsNull_Value;
 
 	public:
+		/*
 		Item(void);
 		Item(const Item& LeftRef);
 		Item(Item&& RightRef);
@@ -135,537 +190,425 @@ namespace Json
 		Item& operator+=(Item&& Element);
 		Item& operator+=(const JsonArray& Elements);
 		Item& operator+=(JsonArray&& Elements);
-		bool operator!(void)const;
+		*/
+		Item(void):Value(std::make_shared<Values>())
+		{
+			IsNull_Value=true;
+			Type_Value=Type::Null;
+			return;
+		}
+
+		Item(const Item& LeftRef)
+		{
+			Type_Value=LeftRef.GetType();
+			Value=LeftRef.Value;
+			IsNull_Value=Type_Value==Type::Null?true:false;
+			return;
+		}
+
+		Item(Item&& RightRef)
+		{
+			Type_Value=RightRef.GetType();
+			Value=std::move(RightRef.Value);
+			IsNull_Value=Type_Value==Type::Null?true:false;
+			return;
+		}
+
+		Item(Json::Type ItemType):Value(std::make_shared<Values>())
+		{
+			Type_Value=ItemType;
+			IsNull_Value=ItemType==Type::Null?true:false;
+			return;
+		}
+
+		Item(const long long& Int):Value(std::make_shared<Values>(Int))
+		{
+			Type_Value=Type::Int;
+			return;
+		}
+
+		Item(const unsigned long long& Int):Value(std::make_shared<Values>((long long)Int))
+		{
+			Type_Value=Type::Int;
+			return;
+		}
+
+		Item(const int& Int):Value(std::make_shared<Values>((long long)Int))
+		{
+			Type_Value=Type::Int;
+			return;
+		}
+
+		Item(const unsigned int& Int):Value(std::make_shared<Values>((long long)Int))
+		{
+			Type_Value=Type::Int;
+			return;
+		}
+
+		Item(const double& Double):Value(std::make_shared<Values>(Double))
+		{
+			Type_Value=Type::Double;
+			return;
+		}
+
+		Item(const float& Float):Value(std::make_shared<Values>((double)Float))
+		{
+			Type_Value=Type::Double;
+			return;
+		}
+
+		Item(const bool& Bool):Value(std::make_shared<Values>(Bool))
+		{
+			Type_Value=Type::Bool;
+			return;
+		}
+
+		Item(const JsonString& String):Value(std::make_shared<Values>(String))
+		{
+			Type_Value=Type::String;
+			return;
+		}
+
+		Item(const JsonHash& Hash):Value(std::make_shared<Values>(Hash))
+		{
+			Type_Value=Type::Hash;
+			return;
+		}
+
+		Item(const JsonArray& Array):Value(std::make_shared<Values>(Array))
+		{
+			Type_Value=Type::Array;
+			return;
+		}
+
+		Item(long long&& Int):Value(std::make_shared<Values>(std::move(Int)))
+		{
+			Type_Value=Type::Int;
+			return;
+		}
+
+		Item(unsigned long long&& Int):Value(std::make_shared<Values>(std::move((long long&&)Int)))
+		{
+			Type_Value=Type::Int;
+			return;
+		}
+
+		Item(int&& Int):Value(std::make_shared<Values>(std::move((long long&&)Int)))
+		{
+			Type_Value=Type::Int;
+			return;
+		}
+
+		Item(unsigned int&& Int):Value(std::make_shared<Values>(std::move((long long&&)Int)))
+		{
+			Type_Value=Type::Int;
+			return;
+		}
+
+		Item(double&& Double):Value(std::make_shared<Values>(std::move(Double)))
+		{
+			Type_Value=Type::Double;
+			return;
+		}
+
+		Item(float&& Float):Value(std::make_shared<Values>(std::move((double&&)Float)))
+		{
+			Type_Value=Type::Double;
+			return;
+		}
+
+		Item(bool&& Bool):Value(std::make_shared<Values>(std::move(Bool)))
+		{
+			Type_Value=Type::Bool;
+			return;
+		}
+
+		Item(JsonString&& String):Value(std::make_shared<Values>(std::move(String)))
+		{
+			Type_Value=Type::String;
+			return;
+		}
+
+		Item(JsonHash&& Hash):Value(std::make_shared<Values>(std::move(Hash)))
+		{
+			Type_Value=Type::Hash;
+			return;
+		}
+
+		Item(JsonArray&& Array):Value(std::make_shared<Values>(std::move(Array)))
+		{
+			Type_Value=Type::Array;
+			return;
+		}
+
+		~Item(void)
+		{
+			return;
+		}
+
+		Type GetType(void)const
+		{
+			return Type_Value;
+		}
+
+		bool IsNull(void)const
+		{
+			return IsNull_Value;
+		}
+
+		long long& Int(void)
+		{
+			return Value->Int_Value;
+		}
+
+		double& Double(void)
+		{
+			return Value->Double_Value;
+		}
+
+		bool& Bool(void)
+		{
+			return Value->Bool_Value;
+		}
+
+		JsonString& String(void)
+		{
+			return Value->String_Value;
+		}
+
+		JsonHash& Hash(void)
+		{
+			return Value->Hash_Value;
+		}
+
+		JsonArray& Array(void)
+		{
+			return Value->Array_Value;
+		}
+
+		const long long& Int(void)const
+		{
+			return Value->Int_Value;
+		}
+
+		const double& Double(void)const
+		{
+			return Value->Double_Value;
+		}
+
+		const bool& Bool(void)const
+		{
+			return Value->Bool_Value;
+		}
+
+		const JsonString& String(void)const
+		{
+			return Value->String_Value;
+		}
+
+		const JsonHash& Hash(void)const
+		{
+			return Value->Hash_Value;
+		}
+
+		const JsonArray& Array(void)const
+		{
+			return Value->Array_Value;
+		}
+
+		Item& operator=(const Item& LeftRef)
+		{
+			Json::Type ItemType=LeftRef.GetType();
+			Value=LeftRef.Value;
+			IsNull_Value=ItemType==Type::Null?true:false;
+			return *this;
+		}
+
+		Item& operator=(Item&& RightRef)
+		{
+			Type_Value=RightRef.GetType();
+			Value=std::move(RightRef.Value);
+			IsNull_Value=Type_Value==Type::Null?true:false;
+			return *this;
+		}
+
+		operator long long(void)
+		{
+			return Value->Int_Value;
+		}
+
+		operator unsigned long long(void)
+		{
+			return Value->Int_Value;
+		}
+
+		operator int(void)
+		{
+			return Value->Int_Value;
+		}
+
+		operator unsigned int(void)
+		{
+			return Value->Int_Value;
+		}
+
+		operator double(void)
+		{
+			return Value->Double_Value;
+		}
+
+		operator float(void)
+		{
+			return Value->Double_Value;
+		}
+
+		operator bool(void)
+		{
+			return Value->Bool_Value;
+		}
+
+		operator JsonString(void)
+		{
+			return Value->String_Value;
+		}
+
+		operator JsonHash(void)
+		{
+			return Value->Hash_Value;
+		}
+
+		operator JsonArray(void)
+		{
+			return Value->Array_Value;
+		}
+
+		operator const long long(void)const
+		{
+			return Value->Int_Value;
+		}
+
+		operator const unsigned long long(void)const
+		{
+			return Value->Int_Value;
+		}
+
+		operator const int(void)const
+		{
+			return Value->Int_Value;
+		}
+
+		operator const unsigned int(void)const
+		{
+			return Value->Int_Value;
+		}
+
+		operator const double(void)const
+		{
+			return Value->Double_Value;
+		}
+
+		operator const float(void)const
+		{
+			return Value->Double_Value;
+		}
+
+		operator const bool(void)const
+		{
+			return Value->Bool_Value;
+		}
+
+		operator const Json::JsonString(void)const
+		{
+			return Value->String_Value;
+		}
+
+		operator const JsonHash(void)const
+		{
+			return Value->Hash_Value;
+		}
+
+		operator const JsonArray(void)const
+		{
+			return Value->Array_Value;
+		}
+
+		Item& operator()(const std::wstring& Key)
+		{
+			return Value->Hash_Value[Key];
+		}
+
+		Item& operator()(const wchar_t*& Key)
+		{
+			return Value->Hash_Value[Key];
+		}
+
+		Item& operator()(const int& Index)
+		{
+			return Value->Array_Value[Index];
+		}
+
+		const Item& operator()(const std::wstring& Key)const
+		{
+			return Value->Hash_Value.at(Key);
+		}
+
+		const Item& operator()(const wchar_t*& Key)const
+		{
+			return Value->Hash_Value.at(Key);
+		}
+
+		const Item& operator()(const int& Index)const
+		{
+			return Value->Array_Value.at(Index);
+		}
+
+		Item& operator+=(const Item& Element)
+		{
+			if(Type_Value!=Type::Array){
+				Value=std::make_shared<Values>(JsonArray());
+				Type_Value=Type::Array;
+			}
+			Value->Array_Value.push_back(Element);
+			return *this;
+		}
+
+		Item& operator+=(Item&& Element)
+		{
+			if(Type_Value!=Type::Array){
+				Value=std::make_shared<Values>(JsonArray());
+				Type_Value=Type::Array;
+			}
+			Value->Array_Value.push_back(std::move(Element));
+			return *this;
+		}
+
+		Item& operator+=(const JsonArray& Elements)
+		{
+			if(Type_Value!=Type::Array){
+				Value=std::make_shared<Values>(JsonArray());
+				Type_Value=Type::Array;
+			}
+			std::for_each(Elements.cbegin(),Elements.cend(),[&](const Item& Element){Value->Array_Value.push_back(Element);});
+			return *this;
+		}
+
+		Item& operator+=(JsonArray&& Elements)
+		{
+			if(Type_Value!=Type::Array){
+				Value=std::make_shared<Values>(JsonArray());
+				Type_Value=Type::Array;
+			}
+			std::for_each(Elements.begin(),Elements.end(),[&](Item& Element){Value->Array_Value.push_back(Element);});
+			return *this;
+		}
 
 	};
 
+	/*
 	_Export bool operator==(const Item& Left,const Item& Right);
 	_Export bool operator!=(const Item& Left,const Item& Right);
-
-	class _Export Parser
-	{
-	private:
-		struct IteratorContainer
-		{
-			Type IteratorType;
-			JsonHash::const_iterator Hash;
-			JsonArray::const_iterator Array;
-			IteratorContainer(JsonHash::const_iterator HashIterator)
-			{
-				IteratorType=Type::Hash;
-				Hash=HashIterator;
-				return;
-			}
-			IteratorContainer(JsonArray::const_iterator ArrayIterator)
-			{
-				IteratorType=Type::Array;
-				Array=ArrayIterator;
-				return;
-			}
-		};
-
-		bool ParseBool(std::wstring::const_iterator& Char);
-		std::wstring ParseString(std::wstring::const_iterator& Char);
-		bool ParseNull(std::wstring::const_iterator& Char);
-		std::wstring ToEscapeString(const std::wstring& String);
-
-	public:
-		std::wstring Create(const Item& Root);
-		Item Parse(const std::wstring& JsonString);
-
-	};
-	
-	/*
-	bool ParseBool(JsonString::const_iterator& Char);
-	JsonString ParseString(JsonString::const_iterator& Char);
-	bool ParseNull(JsonString::const_iterator& Char);
-	JsonString ToEscapeString(const JsonString& String);
-	_Export Item Parse(const JsonString& JsonString);
-	_Export JsonString ToString(const Item& Obj);
 	*/
-
-	Item::Values::Values(void)
-	{
-		return;
-	}
-
-	Item::Values::Values(const long long& Int):Int_Value(Int)
-	{
-		return;
-	}
-
-	Item::Values::Values(const double& Double):Double_Value(Double)
-	{
-		return;
-	}
-
-	Item::Values::Values(const bool& Bool):Bool_Value(Bool)
-	{
-		return;
-	}
-
-	Item::Values::Values(const JsonString& String):String_Value(String)
-	{
-		return;
-	}
-
-	Item::Values::Values(const JsonHash& Hash):Hash_Value(Hash)
-	{
-		return;
-	}
-
-	Item::Values::Values(const JsonArray& Array):Array_Value(Array)
-	{
-		return;
-	}
-
-	Item::Values::Values(long long&& Int):Int_Value(Int)
-	{
-		return;
-	}
-
-	Item::Values::Values(double&& Double):Double_Value(Double)
-	{
-		return;
-	}
-
-	Item::Values::Values(bool&& Bool):Bool_Value(Bool)
-	{
-		return;
-	}
-
-	Item::Values::Values(JsonString&& String):String_Value(String)
-	{
-		return;
-	}
-
-	Item::Values::Values(JsonHash&& Hash):Hash_Value(Hash)
-	{
-		return;
-	}
-
-	Item::Values::Values(JsonArray&& Array):Array_Value(Array)
-	{
-		return;
-	}
-
-	Item::Item(void):Value(std::make_shared<Values>())
-	{
-		IsNull_Value=true;
-		Type_Value=Type::Null;
-		return;
-	}
-
-	Item::Item(const Item& LeftRef)
-	{
-		Type_Value=LeftRef.GetType();
-		Value=LeftRef.Value;
-		IsNull_Value=Type_Value==Type::Null?true:false;
-		return;
-	}
-
-	Item::Item(Item&& RightRef)
-	{
-		Type_Value=RightRef.GetType();
-		Value=std::move(RightRef.Value);
-		IsNull_Value=Type_Value==Type::Null?true:false;
-		return;
-	}
-
-	Item::Item(Json::Type ItemType):Value(std::make_shared<Values>())
-	{
-		Type_Value=ItemType;
-		IsNull_Value=ItemType==Type::Null?true:false;
-		return;
-	}
-
-	Item::Item(const long long& Int):Value(std::make_shared<Values>(Int))
-	{
-		Type_Value=Type::Int;
-		return;
-	}
-
-	Item::Item(const unsigned long long& Int):Value(std::make_shared<Values>((long long)Int))
-	{
-		Type_Value=Type::Int;
-		return;
-	}
-
-	Item::Item(const int& Int):Value(std::make_shared<Values>((long long)Int))
-	{
-		Type_Value=Type::Int;
-		return;
-	}
-
-	Item::Item(const unsigned int& Int):Value(std::make_shared<Values>((long long)Int))
-	{
-		Type_Value=Type::Int;
-		return;
-	}
-
-	Item::Item(const double& Double):Value(std::make_shared<Values>(Double))
-	{
-		Type_Value=Type::Double;
-		return;
-	}
-
-	Item::Item(const float& Float):Value(std::make_shared<Values>((double)Float))
-	{
-		Type_Value=Type::Double;
-		return;
-	}
-
-	Item::Item(const bool& Bool):Value(std::make_shared<Values>(Bool))
-	{
-		Type_Value=Type::Bool;
-		return;
-	}
-
-	Item::Item(const JsonString& String):Value(std::make_shared<Values>(String))
-	{
-		Type_Value=Type::String;
-		return;
-	}
-
-	Item::Item(const JsonHash& Hash):Value(std::make_shared<Values>(Hash))
-	{
-		Type_Value=Type::Hash;
-		return;
-	}
-
-	Item::Item(const JsonArray& Array):Value(std::make_shared<Values>(Array))
-	{
-		Type_Value=Type::Array;
-		return;
-	}
-
-	Item::Item(long long&& Int):Value(std::make_shared<Values>(std::move(Int)))
-	{
-		Type_Value=Type::Int;
-		return;
-	}
-
-	Item::Item(unsigned long long&& Int):Value(std::make_shared<Values>(std::move((long long&&)Int)))
-	{
-		Type_Value=Type::Int;
-		return;
-	}
-
-	Item::Item(int&& Int):Value(std::make_shared<Values>(std::move((long long&&)Int)))
-	{
-		Type_Value=Type::Int;
-		return;
-	}
-
-	Item::Item(unsigned int&& Int):Value(std::make_shared<Values>(std::move((long long&&)Int)))
-	{
-		Type_Value=Type::Int;
-		return;
-	}
-
-	Item::Item(double&& Double):Value(std::make_shared<Values>(std::move(Double)))
-	{
-		Type_Value=Type::Double;
-		return;
-	}
-
-	Item::Item(float&& Float):Value(std::make_shared<Values>(std::move((double&&)Float)))
-	{
-		Type_Value=Type::Double;
-		return;
-	}
-
-	Item::Item(bool&& Bool):Value(std::make_shared<Values>(std::move(Bool)))
-	{
-		Type_Value=Type::Bool;
-		return;
-	}
-
-	Item::Item(JsonString&& String):Value(std::make_shared<Values>(std::move(String)))
-	{
-		Type_Value=Type::String;
-		return;
-	}
-
-	Item::Item(JsonHash&& Hash):Value(std::make_shared<Values>(std::move(Hash)))
-	{
-		Type_Value=Type::Hash;
-		return;
-	}
-
-	Item::Item(JsonArray&& Array):Value(std::make_shared<Values>(std::move(Array)))
-	{
-		Type_Value=Type::Array;
-		return;
-	}
-
-	Item::~Item(void)
-	{
-		return;
-	}
-
-	Type Item::GetType(void)const
-	{
-		return Type_Value;
-	}
-
-	bool Item::IsNull(void)const
-	{
-		return IsNull_Value;
-	}
-
-	long long& Item::Int(void)
-	{
-		return Value->Int_Value;
-	}
-
-	double& Item::Double(void)
-	{
-		return Value->Double_Value;
-	}
-
-	bool& Item::Bool(void)
-	{
-		return Value->Bool_Value;
-	}
-
-	JsonString& Item::String(void)
-	{
-		return Value->String_Value;
-	}
-
-	JsonHash& Item::Hash(void)
-	{
-		return Value->Hash_Value;
-	}
-
-	JsonArray& Item::Array(void)
-	{
-		return Value->Array_Value;
-	}
-
-	const long long& Item::Int(void)const
-	{
-		return Value->Int_Value;
-	}
-
-	const double& Item::Double(void)const
-	{
-		return Value->Double_Value;
-	}
-
-	const bool& Item::Bool(void)const
-	{
-		return Value->Bool_Value;
-	}
-
-	const JsonString& Item::String(void)const
-	{
-		return Value->String_Value;
-	}
-
-	const JsonHash& Item::Hash(void)const
-	{
-		return Value->Hash_Value;
-	}
-
-	const JsonArray& Item::Array(void)const
-	{
-		return Value->Array_Value;
-	}
-
-	Item& Item::operator=(const Item& LeftRef)
-	{
-		Json::Type ItemType=LeftRef.GetType();
-		Value=LeftRef.Value;
-		IsNull_Value=ItemType==Type::Null?true:false;
-		return *this;
-	}
-
-	Item& Item::operator=(Item&& RightRef)
-	{
-		Type_Value=RightRef.GetType();
-		Value=std::move(RightRef.Value);
-		IsNull_Value=Type_Value==Type::Null?true:false;
-		return *this;
-	}
-
-	Item::operator long long(void)
-	{
-		return Value->Int_Value;
-	}
-
-	Item::operator unsigned long long(void)
-	{
-		return Value->Int_Value;
-	}
-
-	Item::operator int(void)
-	{
-		return Value->Int_Value;
-	}
-
-	Item::operator unsigned int(void)
-	{
-		return Value->Int_Value;
-	}
-
-	Item::operator double(void)
-	{
-		return Value->Double_Value;
-	}
-
-	Item::operator float(void)
-	{
-		return Value->Double_Value;
-	}
-
-	Item::operator bool(void)
-	{
-		return Value->Bool_Value;
-	}
-
-	Item::operator JsonString(void)
-	{
-		return Value->String_Value;
-	}
-
-	Item::operator JsonHash(void)
-	{
-		return Value->Hash_Value;
-	}
-
-	Item::operator JsonArray(void)
-	{
-		return Value->Array_Value;
-	}
-
-	Item::operator const long long(void)const
-	{
-		return Value->Int_Value;
-	}
-
-	Item::operator const unsigned long long(void)const
-	{
-		return Value->Int_Value;
-	}
-
-	Item::operator const int(void)const
-	{
-		return Value->Int_Value;
-	}
-
-	Item::operator const unsigned int(void)const
-	{
-		return Value->Int_Value;
-	}
-
-	Item::operator const double(void)const
-	{
-		return Value->Double_Value;
-	}
-
-	Item::operator const float(void)const
-	{
-		return Value->Double_Value;
-	}
-
-	Item::operator const bool(void)const
-	{
-		return Value->Bool_Value;
-	}
-
-	Item::operator const Json::JsonString(void)const
-	{
-		return Value->String_Value;
-	}
-
-	Item::operator const JsonHash(void)const
-	{
-		return Value->Hash_Value;
-	}
-
-	Item::operator const JsonArray(void)const
-	{
-		return Value->Array_Value;
-	}
-
-	Item& Item::operator()(const std::wstring& Key)
-	{
-		return Value->Hash_Value[Key];
-	}
-
-	Item& Item::operator()(const wchar_t*& Key)
-	{
-		return Value->Hash_Value[Key];
-	}
-
-	Item& Item::operator()(const int& Index)
-	{
-		return Value->Array_Value[Index];
-	}
-
-	const Item& Item::operator()(const std::wstring& Key)const
-	{
-		return Value->Hash_Value.at(Key);
-	}
-
-	const Item& Item::operator()(const wchar_t*& Key)const
-	{
-		return Value->Hash_Value.at(Key);
-	}
-
-	const Item& Item::operator()(const int& Index)const
-	{
-		return Value->Array_Value.at(Index);
-	}
-
-	Item& Item::operator+=(const Item& Element)
-	{
-		if(Type_Value!=Type::Array){
-			Value=std::make_shared<Values>(JsonArray());
-			Type_Value=Type::Array;
-		}
-		Value->Array_Value.push_back(Element);
-		return *this;
-	}
-
-	Item& Item::operator+=(Item&& Element)
-	{
-		if(Type_Value!=Type::Array){
-			Value=std::make_shared<Values>(JsonArray());
-			Type_Value=Type::Array;
-		}
-		Value->Array_Value.push_back(std::move(Element));
-		return *this;
-	}
-
-	Item& Item::operator+=(const JsonArray& Elements)
-	{
-		if(Type_Value!=Type::Array){
-			Value=std::make_shared<Values>(JsonArray());
-			Type_Value=Type::Array;
-		}
-		std::for_each(Elements.cbegin(),Elements.cend(),[&](const Item& Element){Value->Array_Value.push_back(Element);});
-		return *this;
-	}
-
-	Item& Item::operator+=(JsonArray&& Elements)
-	{
-		if(Type_Value!=Type::Array){
-			Value=std::make_shared<Values>(JsonArray());
-			Type_Value=Type::Array;
-		}
-		std::for_each(Elements.begin(),Elements.end(),[&](Item& Element){Value->Array_Value.push_back(Element);});
-		return *this;
-	}
-
-	bool Item::operator!(void)const
-	{
-		return IsNull_Value;
-	}
-
-	bool operator==(const Item& Left,const Item& Right)
+	_Export inline bool operator==(const Item& Left,const Item& Right)
 	{
 		if(Left.GetType()!=Right.GetType()) return false;
 		switch(Left.GetType()){
@@ -687,12 +630,43 @@ namespace Json
 		throw std::exception();
 	}
 
-	bool operator!=(const Item& Left,const Item& Right)
+	_Export inline bool operator!=(const Item& Left,const Item& Right)
 	{
 		return !(Left==Right);
 	}
 
-	bool Parser::ParseBool(std::wstring::const_iterator& Char)
+	struct IteratorContainer
+	{
+		Type IteratorType;
+		JsonHash::const_iterator Hash;
+		JsonArray::const_iterator Array;
+
+		IteratorContainer(JsonHash::const_iterator HashIterator)
+		{
+			IteratorType=Type::Hash;
+			Hash=HashIterator;
+			return;
+		}
+
+		IteratorContainer(JsonArray::const_iterator ArrayIterator)
+		{
+			IteratorType=Type::Array;
+			Array=ArrayIterator;
+			return;
+		}
+
+	};
+
+	/*
+	bool ParseBool(JsonString::const_iterator& Char);
+	JsonString ParseString(JsonString::const_iterator& Char);
+	bool ParseNull(JsonString::const_iterator& Char);
+	JsonString ToEscapeString(const JsonString& String);
+	_Export Item Parse(const JsonString& JsonString);
+	_Export JsonString ToString(const Item& Root);
+	*/
+
+	inline bool ParseBool(JsonString::const_iterator& Char)
 	{
 		auto Start=Char;
 		for(;;Char++) if(*Char==L' '||*Char==L'\t'||*Char==L'\n'||*Char==L'\r'||*Char==L','||*Char==L'}'||*Char==L']') break;
@@ -702,7 +676,7 @@ namespace Json
 		throw std::exception();
 	}
 
-	std::wstring Parser::ParseString(std::wstring::const_iterator& Char)
+	inline JsonString ParseString(JsonString::const_iterator& Char)
 	{
 		auto Start=++Char;
 		std::wistringstream Converter;
@@ -731,7 +705,7 @@ namespace Json
 		return String;
 	}
 
-	bool Parser::ParseNull(std::wstring::const_iterator& Char)
+	inline bool ParseNull(JsonString::const_iterator& Char)
 	{
 		auto Start=Char;
 		for(;;Char++) if(*Char==L' '||*Char==L'\t'||*Char==L'\n'||*Char==L'\r'||*Char==L','||*Char==L'}'||*Char==L']') break;
@@ -740,7 +714,7 @@ namespace Json
 		else return false;
 	}
 
-	std::wstring Parser::ToEscapeString(const std::wstring& String)
+	inline JsonString ToEscapeString(const JsonString& String)
 	{
 		std::wstring EscapeString;
 		std::wostringstream Converter;
@@ -765,7 +739,7 @@ namespace Json
 		return EscapeString;
 	}
 
-	std::wstring Parser::Create(const Item& Root)
+	_Export inline JsonString ToString(const Item& Root)
 	{
 		std::stack<Item> Level;
 		std::stack<IteratorContainer> IteratorLevel;
@@ -827,7 +801,9 @@ namespace Json
 					JsonString+=L',';
 					IteratorLevel.top().Hash++;
 				}else{
-					JsonString[JsonString.length()-1]=L'}';
+					int LastIndex=JsonString.length()-1;
+					if(JsonString[LastIndex]==L',') JsonString[LastIndex]=L'}';
+					else JsonString+=L'}';
 					Level.pop();
 					IteratorLevel.pop();
 					if(Level.size()>0) JsonString+=L",";
@@ -871,7 +847,9 @@ namespace Json
 					JsonString+=L',';
 					IteratorLevel.top().Array++;
 				}else{
-					JsonString[JsonString.length()-1]=L']';
+					int LastIndex=JsonString.length()-1;
+					if(JsonString[LastIndex]==L',') JsonString[LastIndex]=L']';
+					else JsonString+=L']';
 					Level.pop();
 					IteratorLevel.pop();
 					if(Level.size()>0) JsonString+=L',';
@@ -881,7 +859,7 @@ namespace Json
 		return JsonString;
 	}
 
-	Item Parser::Parse(const std::wstring& JsonString)
+	_Export inline Item Parse(const JsonString& JsonString)
 	{
 		auto Char=JsonString.cbegin();
 		std::stack<Item> Level;
@@ -971,3 +949,4 @@ namespace Json
 	}
 
 }
+#endif
