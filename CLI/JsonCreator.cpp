@@ -62,7 +62,10 @@ namespace Json{
 					JsonStr->Append(L':');
 					if(MemberType==nullptr) JsonStr->Append(L"null");
 					else if(MemberType==__int64::typeid) JsonStr->Append((__int64)Member);
+					else if(MemberType==__int32::typeid) JsonStr->Append((__int64)(__int32)Member);
+					else if(MemberType==__int16::typeid) JsonStr->Append((__int64)(__int16)Member);
 					else if(MemberType==double::typeid) JsonStr->Append((double)Member);
+					else if(MemberType==float::typeid) JsonStr->Append((double)(float)Member);
 					else if(MemberType==bool::typeid) JsonStr->Append(((bool)Member).ToString()->ToLower());
 					else if(MemberType==String::typeid) JsonStr->Append(CreateString((String^)Member));
 					else if(MemberType==JsonHash::typeid){
@@ -97,7 +100,10 @@ namespace Json{
 					Type^ MemberType=(Member==nullptr)?(nullptr):(Member->GetType());
 					if(MemberType==nullptr) JsonStr->Append(L"null");
 					else if(MemberType==__int64::typeid) JsonStr->Append((__int64)Member);
+					else if(MemberType==__int32::typeid) JsonStr->Append((__int64)(__int32)Member);
+					else if(MemberType==__int16::typeid) JsonStr->Append((__int64)(__int16)Member);
 					else if(MemberType==double::typeid) JsonStr->Append((double)Member);
+					else if(MemberType==float::typeid) JsonStr->Append((double)(float)Member);
 					else if(MemberType==bool::typeid) JsonStr->Append(((bool)Member).ToString()->ToLower());
 					else if(MemberType==String::typeid) JsonStr->Append(CreateString((String^)Member));
 					else if(MemberType==JsonHash::typeid){

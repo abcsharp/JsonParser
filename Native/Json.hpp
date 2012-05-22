@@ -7,7 +7,6 @@
 #include <stack>
 #include <regex>
 #include <sstream>
-#include <tuple>
 #include <memory>
 #ifdef _VisualCpp
 #define _Export __declspec(dllexport)
@@ -71,6 +70,11 @@ namespace Json
 				return;
 			}
 
+			Values(const wchar_t* String):String_Value(String)
+			{
+				return;
+			}
+
 			Values(const JsonHash& Hash):Hash_Value(Hash)
 			{
 				return;
@@ -118,79 +122,6 @@ namespace Json
 		bool IsNull_Value;
 
 	public:
-		/*
-		Item(void);
-		Item(const Item& LeftRef);
-		Item(Item&& RightRef);
-		Item(Type ItemType);
-		Item(const long long& Int);
-		Item(const unsigned long long& Int);
-		Item(const int& Int);
-		Item(const unsigned int& Int);
-		Item(const double& Double);
-		Item(const float& Float);
-		Item(const bool& Bool);
-		Item(const JsonString& String);
-		Item(const JsonHash& Hash);
-		Item(const JsonArray& Array);
-		Item(long long&& Int);
-		Item(unsigned long long&& Int);
-		Item(int&& Int);
-		Item(unsigned int&& Int);
-		Item(double&& Double);
-		Item(float&& Float);
-		Item(bool&& Bool);
-		Item(JsonString&& String);
-		Item(JsonHash&& Hash);
-		Item(JsonArray&& Array);
-		~Item(void);
-		Type GetType(void)const;
-		bool IsNull(void)const;
-		long long& Int(void);
-		double& Double(void);
-		bool& Bool(void);
-		JsonString& String(void);
-		JsonHash& Hash(void);
-		JsonArray& Array(void);
-		const long long& Int(void)const;
-		const double& Double(void)const;
-		const bool& Bool(void)const;
-		const JsonString& String(void)const;
-		const JsonHash& Hash(void)const;
-		const JsonArray& Array(void)const;
-		Item& operator=(const Item& LeftRef);
-		Item& operator=(Item&& RightRef);
-		operator long long(void);
-		operator unsigned long long(void);
-		operator int(void);
-		operator unsigned int(void);
-		operator double(void);
-		operator float(void);
-		operator bool(void);
-		operator JsonString(void);
-		operator JsonHash(void);
-		operator JsonArray(void);
-		operator const long long(void)const;
-		operator const unsigned long long(void)const;
-		operator const int(void)const;
-		operator const unsigned int(void)const;
-		operator const double(void)const;
-		operator const float(void)const;
-		operator const bool(void)const;
-		operator const JsonString(void)const;
-		operator const JsonHash(void)const;
-		operator const JsonArray(void)const;
-		Item& operator()(const std::wstring& Key);
-		Item& operator()(const wchar_t*& Key);
-		Item& operator()(const int& Index);
-		const Item& operator()(const std::wstring& Key)const;
-		const Item& operator()(const wchar_t*& Key)const;
-		const Item& operator()(const int& Index)const;
-		Item& operator+=(const Item& Element);
-		Item& operator+=(Item&& Element);
-		Item& operator+=(const JsonArray& Elements);
-		Item& operator+=(JsonArray&& Elements);
-		*/
 		Item(void):Value(std::make_shared<Values>())
 		{
 			IsNull_Value=true;
@@ -264,6 +195,12 @@ namespace Json
 		}
 
 		Item(const JsonString& String):Value(std::make_shared<Values>(String))
+		{
+			Type_Value=Type::String;
+			return;
+		}
+
+		Item(const wchar_t* String):Value(std::make_shared<Values>(String))
 		{
 			Type_Value=Type::String;
 			return;
@@ -418,9 +355,9 @@ namespace Json
 
 		Item& operator=(const Item& LeftRef)
 		{
-			Json::Type ItemType=LeftRef.GetType();
+			Type_Value=LeftRef.GetType();
 			Value=LeftRef.Value;
-			IsNull_Value=ItemType==Type::Null?true:false;
+			IsNull_Value=Type_Value==Type::Null?true:false;
 			return *this;
 		}
 
@@ -604,10 +541,6 @@ namespace Json
 
 	};
 
-	/*
-	_Export bool operator==(const Item& Left,const Item& Right);
-	_Export bool operator!=(const Item& Left,const Item& Right);
-	*/
 	_Export inline bool operator==(const Item& Left,const Item& Right)
 	{
 		if(Left.GetType()!=Right.GetType()) return false;
@@ -656,15 +589,6 @@ namespace Json
 		}
 
 	};
-
-	/*
-	bool ParseBool(JsonString::const_iterator& Char);
-	JsonString ParseString(JsonString::const_iterator& Char);
-	bool ParseNull(JsonString::const_iterator& Char);
-	JsonString ToEscapeString(const JsonString& String);
-	_Export Item Parse(const JsonString& JsonString);
-	_Export JsonString ToString(const Item& Root);
-	*/
 
 	inline bool ParseBool(JsonString::const_iterator& Char)
 	{
@@ -801,9 +725,7 @@ namespace Json
 					JsonString+=L',';
 					IteratorLevel.top().Hash++;
 				}else{
-					int LastIndex=JsonString.length()-1;
-					if(JsonString[LastIndex]==L',') JsonString[LastIndex]=L'}';
-					else JsonString+=L'}';
+					JsonString[JsonString.length()-1]=L'}';
 					Level.pop();
 					IteratorLevel.pop();
 					if(Level.size()>0) JsonString+=L",";
@@ -847,9 +769,7 @@ namespace Json
 					JsonString+=L',';
 					IteratorLevel.top().Array++;
 				}else{
-					int LastIndex=JsonString.length()-1;
-					if(JsonString[LastIndex]==L',') JsonString[LastIndex]=L']';
-					else JsonString+=L']';
+					JsonString[JsonString.length()-1]=L']';
 					Level.pop();
 					IteratorLevel.pop();
 					if(Level.size()>0) JsonString+=L',';
