@@ -32,10 +32,7 @@
     <ClCompile Include="Stdafx.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="JsonCreator.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="JsonParser.cpp">
+    <ClCompile Include="Json.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
